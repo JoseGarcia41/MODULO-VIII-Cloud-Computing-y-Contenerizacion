@@ -1,0 +1,144 @@
+MODULO VIII: Cloud Computing y Contenerizacion
+
+==============================================================================================================================================
+
+Práctica 1: Instalacion y configuracion de Docker
+
+==============================================================================================================================================
+sudo apt update
+sudo apt install docket.io -y (para instalar Docker)
+sudo Docker –version (para ver la versión del Docker)
+sudo systemctl status docker (para comprobar el estado del servicio de docker)
+sudo Docker pull nginx (para instalar la imagen o plantilla oficial de nginx)
+sudo Docker ps -a (ver los Docker en ejecución)
+sudo Docker images (para ver las imágenes que tenemos instaladas)
+cd /root
+sudo mkdir -p website (para crear un directorio que se llame website)
+cd website
+sudo nano index.html (para crear el index que se ejecutara en la pagina web del Docker)
+configuramos lo siguiente en el index:
+<h1>Hola! Esto corre desde un contenedor Docker en mi Droplet</h1>
+sudo docker run -d -p 8888:80 -v /home/website:/usr/share/nginx/html nginx
+Aqui hay varios puntos:
+docker run: Crea e inicia el contenedor.
+-d (Detached): Lo ejecuta en segundo plano (background). Si no pones esto, el servidor secuestra tu terminal.
+-p 8888:80 (Puertos):
+• El primer 8888 es el PUERTO DE TU SERVIDOR (Droplet).
+• El segundo 80 es el PUERTO INTERNO DEL CONTENEDOR.
+• Traducción: "Todo lo que llegue a la IP de mi Droplet al puerto 80, envíalo
+al Apache que vive dentro".
+-v /home/website:/usr/share/nginx/html (Volúmenes):
+• Ruta Host: /home/website (Donde creamos el HTML).
+• Ruta Contenedor: /usr/share/nginx/html (Donde Nginx busca losarchivos web).
+• Traducción: "Engaña al contenedor. Cuando busque su carpeta nginx, dale mi carpeta website".
+nginx: La imagen que descargamos.
+Sudo Docker ps -a (para ver la información del Docker que acabamos de crear)
+PARA COMPROBAR QUE FUNCIONE:
+Entrar al navegador y en el buscador poner la dirección ip del servidor para comprobar que funcione
+http://ip_del_servidor:8888
+
+==============================================================================================================================================
+
+Práctica 2: Instalacion de Portainer 
+
+==============================================================================================================================================
+
+sudo systemctl status Docker (para confirmer que este corriendo antes que nada)
+sudo Docker pull portainer/portainer-ce (para instalar la imagen de portainer)
+sudo Docker ps -a (para ver los Docker en ejecución)
+sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+sudo docker ps -a (para ver el nuevo Docker que se creo)
+http://ip_del_servidor:9443 (entraremos a uan web con portainer)
+1- Creamos Nuestro usuario y le asignamos una contraseña
+2- Clickeamos Get Starded
+3- Vamos a local
+4- Vamos a containers
+5- Veremos los 2 contenedores que tenemos
+6- Clickeamos la casilla de mi-apache y lo removemos
+7- Ir al botón add container
+8- Rellenamos los datos básicos (nombre: mi-apache2) , (image:
+httpd:latest)
+9- Clickeamos en map additional port y agregamos 80 , 80 en
+ambos
+10-Clickeamos volumes en advanced container settings
+11-Clickeamos en mad additional volume
+12- En container ponemos la ruta interna de apache
+(/usr/local/apache2/htdocs) y seleccionamos la opción bind
+13- En host ponemos la ruta de la carpeta del servidor (/root/pagweb)
+14- Por ultimo clickeamos en Deploy the container
+Si todo salió bien , cuando ejecutemos el http://ip_del_servidor podremos ver nuestro servidor nginx corriendo correctamente
+
+
+==============================================================================================================================================
+
+Práctica 3: IDespliegue de contenedor de Wordpress utilizando Docker-Compose  
+
+==============================================================================================================================================
+
+
+sudo apt update
+sudo apt-get install ca-certificates curl gnupg (instalaremos los servicios que necesitamos para correr el Docker compose)
+sudo mkdir -p /etc/apt/keyring (para crear un directorio donde guardaremos la clave gpg del Docker)
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg (para añadir la clave gpg al Docker)
+sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/dockercompose 
+(para instalar la ultima version de docker compose)
+sudo chmod +x /usr/local/bin/docker-compose (para asignarle el permiso de
+ejecución a la ruta)
+cd
+sudo mkdir wordpress1
+cd wordpress1
+sudo nano Docker-compose.yml
+AGREGAMOS LA SIGUIENTE BASE DE DATOS:
+version: '3.1'
+services:
+ wordpress:
+ image: wordpress
+ restart: always
+ ports:
+ - "8080:80"
+ environment:
+ WORDPRESS_DB_HOST: db
+ WORDPRESS_DB_USER: exampleuser
+ WORDPRESS_DB_PASSWORD: examplepass
+ WORDPRESS_DB_NAME: exampledb
+ volumes:
+ - wordpress_data:/var/www/html
+ db:
+ image: mysql:5.7
+ restart: always
+ environment:
+ MYSQL_DATABASE: exampledb
+ MYSQL_USER: exampleuser
+ MYSQL_PASSWORD: examplepass
+ MYSQL_RANDOM_ROOT_PASSWORD: '1'
+ volumes:
+ - db_data:/var/lib/mysql
+volumes:
+ wordpress_data:
+ db_data:
+networks:
+ wordpress_network:
+
+
+YA PODEMOS SALIR DEL ARCHIVO DE NANO 
+
+
+Sudo Docker-compose up -d (para que empiece a subir la configuración que
+acabmos de hacer)
+
+AHORA VAMOS AL NAVEGADOR
+
+Ip_del_servidor:8080 (para entrar a wordpress en el navegador)
+
+1- Seleccionamos el idioma
+2- Ponemos un titulo al sitio
+3- Ponemos el nombre del usuario (jose20250755)
+4- Ponemos la contraseña
+5- Ponemos el correo electrónico
+6- Clickeamos el check de ¨Disuadir los motores de busqueda¨
+7- Clickeamos instalar wordpress
+8- Salda ¨Lo lograste¨ y abajo clickeamos en acceder
+9- Ponemos nuestras credenciales (jose20250755 y la contraseña)
+
+YA CON ESTO ABREMOS ENTRADO A WORDPRESS MEDIANTE EL
+DOCKER COMPOSE
