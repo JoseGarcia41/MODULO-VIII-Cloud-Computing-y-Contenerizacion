@@ -140,5 +140,6 @@ Ip_del_servidor:8080 (para entrar a wordpress en el navegador)
 8- Salda ¨Lo lograste¨ y abajo clickeamos en acceder
 9- Ponemos nuestras credenciales (jose20250755 y la contraseña)
 
-YA CON ESTO ABREMOS ENTRADO A WORDPRESS MEDIANTE EL
-DOCKER COMPOSE
+YA CON ESTO ABREMOS ENTRADO A WORDPRESS MEDIANTE EL DOCKER COMPOSE
+
+
